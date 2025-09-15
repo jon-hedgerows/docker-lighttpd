@@ -60,7 +60,7 @@ jobs:
             # output 1, disabled if major zero
             type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
             # full length sha
-            type=sha,format=long
+            type=sha,format=short
           labels: |
             org.opencontainers.image.description=Lighttpd on Ubuntu linux plus extras
 

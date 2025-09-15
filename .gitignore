@@ -1,0 +1,2 @@
+# don't store the access log
+test-data/logs/access.log

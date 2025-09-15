@@ -1,2 +1,2 @@
-docker buildx build . -t docker-lighttpd:dev
+docker buildx build . -t docker-lighttpd:local
 docker image prune --force
