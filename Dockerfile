@@ -1,10 +1,9 @@
-FROM ubuntu:noble
+FROM alpine:latest AS lighttpd
 
 LABEL maintainer="Jon Davies <jon@hedgerows.org.uk>" \
     maintainer.org="Jon Davies" \
     maintainer.org.uri="https://github.com/jon-hedgerows" \
     # Open container labels \
-    org.opencontainers.image.description="Lighttpd on Ubuntu linux plus extras" \
     org.opencontainers.image.vendor="Jon Davies" \
     org.opencontainers.image.source="https://github.com/jon-hedgerows/docker-lighttpd" \
     # Artifact hub annotations \
@@ -12,17 +11,23 @@ LABEL maintainer="Jon Davies <jon@hedgerows.org.uk>" \
     io.artifacthub.package.readme-url="https://github.com/jon-hedgerows/docker-lighttpd/-/raw/main/README.md" \
     io.artifacthub.package.logo-url="https://github.com/jon-hedgerows/docker-lighttpd/-/raw/main/favicon.svg"
 
+LABEL org.opencontainers.image.description="lighttpd with mod_auth on Alpine" 
+
+ARG WWWDATA_UID="82"
+
 ENV PORT=8000 \
     SERVER_NAME="localhost" \
     SERVER_ROOT="/data/html/" \
     CONFIG_FILE="/etc/lighttpd/lighttpd.conf" \
     SKIP_HEALTHCHECK="false" \
-    MAX_FDS="1024"
+    MAX_FDS="1024" \
+    WWWDATA_UID="${WWWDATA_UID}"
 
-RUN apt-get -yqq update \
-    && apt-get -yqq upgrade
+RUN apk --update-cache upgrade
 
-RUN apt-get -yqq install lighttpd curl bash git
+RUN apk add lighttpd lighttpd-mod_auth curl
+
+RUN adduser -u ${WWWDATA_UID} -S www-data -G www-data
 
 COPY ./files /staging/
 
@@ -46,3 +51,13 @@ HEALTHCHECK --interval=1m --timeout=5s --start-period=30s CMD healthcheck
 ENTRYPOINT ["entrypoint"]
 CMD ["-D"]
 # CMD ["/bin/bash", "-c", "while true; do date ; sleep 60 ; done"]
+
+FROM lighttpd AS lighttpd-webdav
+
+LABEL org.opencontainers.image.description="lighttpd with webdav on Alpine"
+RUN apk --update-cache add lighttpd-mod_webdav
+
+FROM lighttpd AS lighttpd-extra
+
+LABEL org.opencontainers.image.description="lighttpd on Alpine plus extras"
+RUN apk --update-cache add bash git
