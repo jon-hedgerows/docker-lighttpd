@@ -13,16 +13,10 @@ on:
       - "**"
 
 jobs:
-  build-and-push:
-    name: Build Docker Images
+  setup:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-
+    outputs:
+      targets: ${{ steps.targets.outputs.targets }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,12 +34,50 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Get targets
+        id: targets
+        run: |
+          echo targets=\[\"$(grep -ie "^from[[:space:]].*[[:space:]]as[[:space:]].*$" Dockerfile | awk '{print $4}
+')\"\] | sed 's/ /","/g' >> $GITHUB_OUTPUT
+
+  build-and-push:
+    name: Build Docker Images
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.setup.outputs.targets) }}
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      # - name: Checkout
+      #   uses: actions/checkout@v4
+
+      # - name: Log in to ghcr.io
+      #   uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
+
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v3
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            name=ghcr.io/${{ github.repository }}
+            name=ghcr.io/jon-hedgerows/${{ matrix.target }}
           tags: |
             # add the dev tag, except for tags
             type=raw,value=dev,enable=${{ !startsWith(github.ref, 'refs/tags/') }}
@@ -71,4 +103,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
+          target: ${{ matrix.target }}
           platforms: linux/amd64,linux/arm64
