@@ -37,8 +37,7 @@ jobs:
       - name: Get targets
         id: targets
         run: |
-          echo targets=\[\"$(grep -ie "^from[[:space:]].*[[:space:]]as[[:space:]].*$" Dockerfile | awk '{print $4}
-')\"\] | sed 's/ /","/g' >> $GITHUB_OUTPUT
+          echo targets=\[\"$(grep -ie "^from[[:space:]].*[[:space:]]as[[:space:]].*$" Dockerfile | awk '{print $4}')\"\] | sed 's/ /","/g' >> "$GITHUB_OUTPUT"
 
   build-and-push:
     name: Build Docker Images
