@@ -19,7 +19,7 @@ jobs:
       targets: ${{ steps.targets.outputs.targets }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Get targets
         id: targets
@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Log in to ghcr.io
         uses: docker/login-action@v4
