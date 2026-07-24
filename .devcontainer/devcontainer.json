@@ -26,7 +26,14 @@
 	"postCreateCommand": "",
 	//
 	// Configure tool-specific properties.
-	"customizations": {},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"esbenp.prettier-vscode",
+				"foxundermoon.shell-format"
+			]
+		}
+	},
 	"portsAttributes": {
 		"8000": {
 			"label": "lighttpd"

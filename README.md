@@ -1,6 +1,6 @@
 # docker-lighttpd
 
-A docker container running lighttpd on ubuntu, with a few extras
+A docker container running lighttpd on Alpine, with a few extras
 
 - git
 - bash

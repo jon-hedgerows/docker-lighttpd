@@ -59,5 +59,5 @@ RUN apk --update-cache add lighttpd-mod_webdav
 
 FROM lighttpd AS lighttpd-extra
 
-LABEL org.opencontainers.image.description="lighttpd on Alpine plus extras"
+LABEL org.opencontainers.image.description="lighttpd plus extras on Alpine"
 RUN apk --update-cache add bash git
